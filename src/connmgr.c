@@ -13,19 +13,14 @@
 
 #define MAX_SENSORS 10 
 
+typedef struct {
+        int port;
+        sbuffer_t *shared_buffer_conmgr;
+    } conmgr_arg_t;
+
 void *connmgr_run(void *arg) {
-    // Ép kiểu tham số truyền vào
-    // Tham số thực tế chúng ta cần thiết kế lại một struct chứa port và sbuffer
-    // Để đơn giản theo main.c, ta tạm hiểu arg là con trỏ chứa thông tin port.
-    // Dưới đây tôi fix cứng port để bạn dễ test, hoặc bạn có thể pass qua struct.
-    
-    // Giả sử arg là một struct tự định nghĩa (cần update trong main.c):
-    // typedef struct { int port; sbuffer_t *buffer; } conn_args_t;
-    // conn_args_t *args = (conn_args_t *)arg;
-    
-    // Tạm thời fix cứng port và giả định arg là shared_buffer
-    int port = 1234; // Bạn nên lấy từ argv trong main truyền vào
-    sbuffer_t *shared_buffer = (sbuffer_t *)arg;
+
+    conmgr_arg_t *conmgr_arg = (conmgr_arg_t*)arg;
 
     int server_fd;
     struct sockaddr_in server_addr;
@@ -41,7 +36,7 @@ void *connmgr_run(void *arg) {
 
     server_addr.sin_family = AF_INET;
     server_addr.sin_addr.s_addr = INADDR_ANY;
-    server_addr.sin_port = htons(port);
+    server_addr.sin_port = htons(conmgr_arg->port);
 
 
 
@@ -53,7 +48,7 @@ void *connmgr_run(void *arg) {
     // 3 listen
     listen(server_fd, MAX_SENSORS);
 
-    printf("[ConnMgr] Lắng nghe kết nối TCP trên port %d...\n", port);
+    printf("[ConnMgr] Lắng nghe kết nối TCP trên port %d...\n", conmgr_arg->port);
 
     // nhiều client -> nhiều fd -> io multiplex (slect, poll, epoll) -> poll
     struct pollfd fds[MAX_SENSORS + 1];
@@ -94,7 +89,7 @@ void *connmgr_run(void *arg) {
                 if (valread > 0) {
                     // Đã nhận được dữ liệu hoàn chỉnh, đẩy vào sbuffer
                     printf("[ConnMgr] Nhận từ Sensor ID %d: Temp=%.2f\n", data.id, data.value);
-                    sbuffer_insert(shared_buffer, &data);
+                    sbuffer_insert(conmgr_arg->shared_buffer_conmgr, &data);
                 } 
                 else if (valread == 0) {
                     // Sensor đã ngắt kết nối

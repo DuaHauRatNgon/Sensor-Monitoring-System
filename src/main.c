@@ -46,10 +46,17 @@ int main(int argc, char *argv[]) {
 
     pthread_t conn_thread, data_thread, storage_thread;
     
-    pthread_create(&conn_thread, NULL, connmgr_run, shared_buffer);
 
+    typedef struct {
+        int port;
+        sbuffer_t *shared_buffer_conmgr;
+    } conmgr_arg_t;
 
-    // pthread_create(&conn_thread, NULL, connmgr_run, (void *) argv[1]);
+    conmgr_arg_t conmgr_arg;
+    conmgr_arg.port = port;
+    conmgr_arg.shared_buffer_conmgr = shared_buffer; 
+
+    pthread_create(&conn_thread, NULL, connmgr_run, (void *) &conmgr_arg);
     // pthread_create(&data_thread, NULL, datamgr_run, shared_buffer);
     // pthread_create(&storage_thread, NULL, storagemgr_run, shared_buffer);
 

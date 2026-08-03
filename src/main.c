@@ -32,7 +32,7 @@ int main(int argc, char *argv[]) {
 
     // log proccess
     if (child_pid == 0) {
-        run_log_process(); 
+        // run_log_process(); 
         
         exit(EXIT_SUCCESS); 
     }
@@ -46,14 +46,17 @@ int main(int argc, char *argv[]) {
 
     pthread_t conn_thread, data_thread, storage_thread;
     
-    pthread_create(&conn_thread, NULL, connmgr_run, (void *) argv[1]);
-    pthread_create(&data_thread, NULL, datamgr_run, shared_buffer);
-    pthread_create(&storage_thread, NULL, storagemgr_run, shared_buffer);
+    pthread_create(&conn_thread, NULL, connmgr_run, shared_buffer);
+
+
+    // pthread_create(&conn_thread, NULL, connmgr_run, (void *) argv[1]);
+    // pthread_create(&data_thread, NULL, datamgr_run, shared_buffer);
+    // pthread_create(&storage_thread, NULL, storagemgr_run, shared_buffer);
 
 
     pthread_join(conn_thread, NULL);
-    pthread_join(data_thread, NULL);
-    pthread_join(storage_thread, NULL);
+    // pthread_join(data_thread, NULL);
+    // pthread_join(storage_thread, NULL);
 
     
     sbuffer_free(&shared_buffer);

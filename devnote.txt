@@ -1,0 +1,20 @@
+Vấn đề 1: 
+
+Nếu một luồng (ví dụ Data Manager) đọc xong 1 Node và lập tức free() (xóa) nó đi, 
+Storage Manager sẽ bị lỗi Segmentation Fault khi cố truy cập vào con trỏ đã bị giải phóng. 
+Ngược lại, nếu không ai xóa, hệ thống sẽ bị Memory Leak (tràn bộ nhớ).
+
+--> lần tới test ta sẽ thử các trường hợp này
+
+
+Vấn đề 2:
+ c ko có oop mà chỉ có hướng hàm cho nên ta có thể coi 
+sbuffer là 1 đối tượng, nó xuất các api (init, read, insert) cho main và các proccess sử dụng ?
+các api đó được khai báo trong sbuffer.h và được triển khai trong sbuffer.c ? 
+tại sao lại cần các file .h ? 
+
+
+vấn đề 3:
+sbuffer_t *shared_buffer;
+sbuffer_init(&shared_buffer);
+tại sao lại có dấu * ? tại sao lại dùng dấu & ?
